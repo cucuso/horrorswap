@@ -15,7 +15,7 @@ angular
     'ngResource',
     'ngRoute',
     'ngSanitize',
-    'ngTouch'
+    'ngTouch',
   ])
 .constant('AUTH_EVENTS', {
     loginSuccess: 'auth-login-success',
@@ -32,16 +32,16 @@ angular
         controller: 'MainCtrl',
         controllerAs: 'main'
       })
-      .when('/about', {
-        templateUrl: 'views/about.html',
-        controller: 'AboutCtrl',
-        controllerAs: 'about'
+      .when('/home', {
+        templateUrl: 'views/home.html',
+        controller: 'HomeCtrl',
+        controllerAs: 'home'
       })
       .otherwise({
         redirectTo: '/'
       });
   })
-  .service( 'AuthService', function($http) {
+  .service( 'AuthService', function($http,$q) {
 
     var self = this;
     this.user = window.user;
@@ -53,8 +53,11 @@ angular
 
 
     this.login = function(credentials){
+        var deferred = $q.defer();
       $http.post('/login', credentials).then(function(res){
-        self.user = res;
+          self.user = res;
+          deferred.resolve();
       });
+        return deferred.promise;
     };
   });

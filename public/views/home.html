@@ -1,0 +1,90 @@
+
+  <div class="" ng-controller="HomeCtrl">
+
+      <p class="main-header-text">
+      <h1>Upload here:</h1>
+
+
+      <form action="http://www.cs.tut.fi/cgi-bin/run/~jkorpela/echo.cgi"
+            enctype="multipart/form-data" method="post">
+          <p>
+              Type some text (if you like):<br>
+              <input type="text" name="textline" size="30">
+          </p>
+          <p>
+              Please specify a file, or a set of files:<br>
+              <input type="file" name="datafile" size="40">
+          </p>
+          <div>
+              <input type="submit" value="Send">
+          </div>
+      </form>
+
+      </p>
+
+
+
+
+
+
+
+
+    <p class="main-header-text">Masks for trade:</p>
+    name: {{mask.name}}<br>
+    <h1>images:</h1>
+    <div ng-repeat=" i in mask.images">
+     {{i.url}}
+
+    </ng-repeat>
+    </div>
+
+
+    <br>
+    <h1>requests</h1>
+      <div ng-repeat=" i in mask.requests">
+        {{i.user}}
+
+        </ng-repeat>
+      </div>
+
+
+<br>
+    <h1>offers</h1>
+        <div ng-repeat=" i in mask.offers">
+          {{i.user}}
+
+          </ng-repeat>
+
+        </div>
+<br>
+    <h1>accepted</h1>
+{{mask.accepted}}
+
+
+
+    <!-- Trigger the modal with a button -->
+    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Modal Header</h4>
+          </div>
+          <div class="modal-body">
+            <p>Some text in the modal.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    </div>
+
