@@ -93,6 +93,13 @@ module.exports = function(app, passport) {
     res.json({message:'hello there'});
   });
 
+  app.post('/upload', auth, function (req, res) {
+
+    console.log(req.param(data));
+    res.json({message:'hello there'});
+  });
+
+
 
 // application -------------------------------------------------------------
   app.get('*', function (req, res) {

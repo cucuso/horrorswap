@@ -16,15 +16,8 @@ angular
     'ngRoute',
     'ngSanitize',
     'ngTouch',
+    'ngFileUpload'
   ])
-.constant('AUTH_EVENTS', {
-    loginSuccess: 'auth-login-success',
-    loginFailed: 'auth-login-failed',
-    logoutSuccess: 'auth-logout-success',
-    sessionTimeout: 'auth-session-timeout',
-    notAuthenticated: 'auth-not-authenticated',
-    notAuthorized: 'auth-not-authorized'
-  })
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
@@ -42,10 +35,8 @@ angular
       });
   })
   .service( 'AuthService', function($http,$q) {
-
     var self = this;
     this.user = window.user;
-
 
     this.logout = function(){
       $http.post('/logout');

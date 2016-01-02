@@ -10,6 +10,8 @@ var methodOverride = require('method-override'); // simulate DELETE and PUT (exp
 var passport = require('passport');
 var configDB = require('./app/database.js');
 var session   = require('express-session');
+var multer  = require('multer');
+
 
 // configuration =================
 mongoose.connect(configDB.url);     // connect to mongoDB database
@@ -22,13 +24,13 @@ app.use(bodyParser.urlencoded({'extended':'true'}));            // parse applica
 app.use(bodyParser.json());                                     // parse application/json
 app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
 app.use(methodOverride());
-
 app.use(session({secret: 'suckerMentality'}));
 app.use(passport.initialize());
 app.use(passport.session());
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
+require('./app/multer.js')(multer,app);
 require('./app/routes.js')(app,passport);
 
 
