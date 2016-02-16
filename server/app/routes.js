@@ -100,11 +100,11 @@ module.exports = function(app, passport) {
   });
 
 
-
+/*
 // application -------------------------------------------------------------
   app.get('*', function (req, res) {
    res.render('index', {user:JSON.stringify(req.user)}); // load the single view file (angular will handle the page changes on the front-end)
-  });
+  });*/
 }
 
 // route middleware to make sure a user is logged in

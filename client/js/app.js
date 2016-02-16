@@ -1,13 +1,5 @@
 'use strict';
 
-/**
- * @ngdoc overview
- * @name maskSwapApp
- * @description
- * # maskSwapApp
- *
- * Main module of the application.
- */
 angular
   .module('horrorSwapApp', [
     'ngCookies',
@@ -29,6 +21,11 @@ angular
         templateUrl: 'views/home.html',
         controller: 'HomeCtrl',
         controllerAs: 'home'
+      }) 
+      .when('/signup', {
+        templateUrl: 'views/signup.html',
+        controller: 'SignUpCtrl',
+        controllerAs: 'signup'
       })
       .otherwise({
         redirectTo: '/'
@@ -50,5 +47,15 @@ angular
           deferred.resolve();
       });
         return deferred.promise;
+    };
+
+    this.signup = function(credentials){
+ var deferred = $q.defer();
+      $http.post('/signup', credentials.then(function(res){
+
+        self.user = res;
+        deferred.resolve();
+      }))
+        return derred.promise;
     };
   });

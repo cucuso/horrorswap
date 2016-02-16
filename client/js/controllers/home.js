@@ -1,12 +1,6 @@
 'use strict';
 
-/**
- * @ngdoc function
- * @name maskSwapApp.controller:AboutCtrl
- * @description
- * # AboutCtrl
- * Controller of the maskSwapApp
- */
+
 angular.module('horrorSwapApp')
   .controller('HomeCtrl', function ($scope, Upload, $timeout) {
     this.awesomeThings = [
