@@ -1,43 +1,122 @@
-// server.js
+var express = require('express');
+var app = express();
+var bodyParser = require('body-parser');
+var morgan = require('morgan');
+var mongoose = require('mongoose');
+var jwt = require('jsonwebtoken');
+var config = require('./config');
+var User = require('./app/models/user');
 
-// set up ========================
-var express  = require('express');
-var app      = express();                               // create our app w/ express
-var mongoose = require('mongoose');                     // mongoose for mongodb
-var morgan = require('morgan');             // log requests to the console (express4)
-var bodyParser = require('body-parser');    // pull information from HTML POST (express4)
-var methodOverride = require('method-override'); // simulate DELETE and PUT (express4)
-var passport = require('passport');
-var configDB = require('./app/database.js');
-var session   = require('express-session');
-var multer  = require('multer');
+var port = process.env.PORT || 8080;
+mongoose.connect(config.database);
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
-// configuration =================
-mongoose.connect(configDB.url);     // connect to mongoDB database
-require('./app/passport')(passport);
-
-app.use(express.static(__dirname + '/public'));
-app.set('views', __dirname + '/public/');// set the static files location /public/img will be /img for users
-app.use(morgan('dev'));                                         // log every request to the console
-app.use(bodyParser.urlencoded({'extended':'true'}));            // parse application/x-www-form-urlencoded
-app.use(bodyParser.json());                                     // parse application/json
-app.use(bodyParser.json({ type: 'application/vnd.api+json' })); // parse application/vnd.api+json as json
-app.use(methodOverride());
-app.use(session({secret: 'suckerMentality'}));
-app.use(passport.initialize());
-app.use(passport.session());
-// set the view engine to ejs
-app.set('view engine', 'ejs');
-
-require('./app/multer.js')(multer,app);
-require('./app/routes.js')(app,passport);
+app.use(morgan('dev'));
+app.set('superSecret', 'CucuSo'); // secret variable
 
 
 
+// get an instance of the router for api routes
+var apiRoutes = express.Router();
+
+// =======================
+// routes ================
+// =======================
+apiRoutes.get('/', function (req, res) {
+  res.send('Hello! The API is at http://localhost:' + port + '/api');
+});
+
+apiRoutes.get('/setup', function (req, res) {
+  // create a sample user
+  var nick = new User({
+    email: 'test@test.com',
+    password: '123'
+  });
+  // save the sample user
+  nick.save(function (err) {
+    if (err) throw err;
+    console.log('User saved successfully');
+    res.json({ success: true });
+  });
+});
+
+// route to authenticate a user (POST http://localhost:8080/api/authenticate)
+apiRoutes.post('/authenticate', function (req, res) {
+  // find the user
+  User.findOne({
+    email: req.body.email
+  }, function (err, user) {
+
+    if (err) throw err;
+
+    if (!user) {
+      res.json({ success: false, message: 'Authentication failed. User not found.' });
+    } else if (user) {
+
+      // check if password matches
+      if (user.password != req.body.password) {
+        res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+      } else {
+
+        var token = jwt.sign(user, app.get('superSecret'), {
+          expiresIn: 1440 // expires in 24 hours
+        });
+        // if user is found and password is right
+        // create a token
+        // var token = jwt.sign(user, app.get('superSecret'), {
+        //   expiresInMinutes: 1440 // expires in 24 hours
+        // });
+
+        // return the information including token as JSON
+        res.json({
+          success: true,
+          message: 'Enjoy your token!',
+          token: token
+        });
+      }
+    }
+  });
+});
 
 
+// route middleware to verify a token
+apiRoutes.use(function (req, res, next) {
+  // check header or url parameters or post parameters for token
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+  // decode token
+  if (token) {
+    // verifies secret and checks exp
+    jwt.verify(token, app.get('superSecret'), function (err, decoded) {
+      if (err) {
+        return res.json({ success: false, message: 'Failed to authenticate token.' });
+      } else {
+        // if everything is good, save to request for use in other routes
+        req.decoded = decoded;
+        next();
+      }
+    });
+  } else {
+    // if there is no token
+    // return an error
+    return res.status(403).send({
+      success: false,
+      message: 'No token provided.'
+    });
+  }
+});
 
-// listen (start app with node server.js) ======================================
-app.listen(3000);
-console.log("App listening on port 3000");
+// route to return all users (GET http://localhost:8080/api/users)
+apiRoutes.get('/users', function (req, res) {
+  // -doc gives you access to user object
+  console.log('this is the decoded token:',req.decoded._doc.email);
+  User.find({}, function (err, users) {
+    res.json(users);
+  });
+});
+
+// apply the routes to our application with the prefix /api
+app.use('/api', apiRoutes);
+app.listen(port);
+console.log('Magic happens at http://localhost:' + port);
